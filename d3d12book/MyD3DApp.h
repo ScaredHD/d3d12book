@@ -29,7 +29,15 @@ class MyD3DApp : public MyApp {
 
     void OnKeyUp() override;
 
-    void OnResize(int width, int height) override;
+    void OnResize() override;
+
+    void CreateCommandObjects();
+
+    void CreateSwapChain();
+
+    void CreateDescriptorHeaps();
+
+    void SetMsaa4x(bool state);
 
   private:
     Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
@@ -41,4 +49,15 @@ class MyD3DApp : public MyApp {
 
     DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
     UINT msaa4xQuality;
+    bool msaa4xEnabled = false;
+
+
+    Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
+
+    Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
+    const int swapChainBufferCount = 2;
+
+
 };

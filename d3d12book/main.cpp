@@ -14,6 +14,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
         throw std::runtime_error("Failed to initialize window");
     }
 
+    if (!d3dApp.InitializeD3D()) {
+        throw std::runtime_error("Failed to initialize D3D");
+    }
+
     d3dApp.ShowWindow();
 
     while (d3dApp.PollEvents()) {

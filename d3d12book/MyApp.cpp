@@ -37,6 +37,11 @@ bool MyApp::InitializeWindow(std::wstring windowName) {
 
     RegisterClass(&wc);
 
+    RECT rect = {0, 0, static_cast<LONG>(clientWidth), static_cast<LONG>(clientHeight)};
+    AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
+    LONG width = rect.right - rect.left;
+    LONG height = rect.bottom - rect.top;
+
     hwnd = CreateWindowEx(0,                    // Optional window styles.
                           L"MainWnd",           // Window class
                           windowName.c_str(),   // Window text
@@ -45,8 +50,8 @@ bool MyApp::InitializeWindow(std::wstring windowName) {
                           // Size and position
                           CW_USEDEFAULT,
                           CW_USEDEFAULT,
-                          CW_USEDEFAULT,
-                          CW_USEDEFAULT,
+                          width,
+                          height,
 
                           0,          // Parent window
                           0,          // Menu
@@ -80,7 +85,7 @@ LRESULT MyApp::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             return 0;
 
         case WM_SIZE:
-            OnResize(LOWORD(lParam), HIWORD(lParam));
+            OnResize();
             return 0;
 
         case WM_LBUTTONDOWN:

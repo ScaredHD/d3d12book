@@ -22,6 +22,9 @@ class MyApp {
 
     virtual LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+    unsigned int GetClientWidth() const { return clientWidth; }
+    unsigned int GetClientHeight() const { return clientHeight; }
+
   protected:
     virtual void OnMouseDown(int xPos, int yPos) {}
 
@@ -31,7 +34,7 @@ class MyApp {
 
     virtual void OnKeyUp() {}
 
-    virtual void OnResize(int width, int height) {}
+    virtual void OnResize() {}
 
     [[nodiscard]] bool IsMouseDown() const { return mouseDown; }
 
@@ -42,6 +45,9 @@ class MyApp {
   private:
     // ReSharper disable once IdentifierTypo
     HWND hwnd;
+
+    UINT clientWidth = 800;
+    UINT clientHeight = 600;
 
     HINSTANCE hInstance;
     HINSTANCE hPrevInstance;
