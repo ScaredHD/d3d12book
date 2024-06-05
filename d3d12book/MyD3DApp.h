@@ -37,6 +37,16 @@ class MyD3DApp : public MyApp {
 
     void CreateDescriptorHeaps();
 
+    D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentBackBufferView() const;
+
+    D3D12_CPU_DESCRIPTOR_HANDLE GetStartSwapChainBufferView() const;
+
+    D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilView() const;
+
+    void CreateBackBufferViews();
+
+    void CreateDepthStencilView();
+
     void SetMsaa4x(bool state);
 
   private:
@@ -51,13 +61,18 @@ class MyD3DApp : public MyApp {
     UINT msaa4xQuality;
     bool msaa4xEnabled = false;
 
-
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
-    const int swapChainBufferCount = 2;
+    static constexpr int s_swapChainBufferCount = 2;
+    int currBackBuffer = 0;
 
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
+    DXGI_FORMAT depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
+    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer;
+    Microsoft::WRL::ComPtr<ID3D12Resource> swapChainBuffers[s_swapChainBufferCount];
 };

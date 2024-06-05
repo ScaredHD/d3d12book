@@ -26,6 +26,8 @@ void MyD3DApp::OnKeyUp() {
 }
 
 void MyD3DApp::OnResize() {
+    CreateBackBufferViews();
+    CreateDepthStencilView();
     MyApp::OnResize();
 }
 
@@ -68,7 +70,7 @@ bool MyD3DApp::InitializeD3D() {
         D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
     // 4x MSAA quality support
-    D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS qualityLevels;
+    D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS qualityLevels{};
     qualityLevels.Format = backBufferFormat;
     qualityLevels.SampleCount = 4;
     qualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
@@ -88,7 +90,7 @@ bool MyD3DApp::InitializeD3D() {
 }
 
 void MyD3DApp::CreateCommandObjects() {
-    D3D12_COMMAND_QUEUE_DESC desc;
+    D3D12_COMMAND_QUEUE_DESC desc{};
     desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
     desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     ThrowIfFailed(
@@ -108,7 +110,7 @@ void MyD3DApp::CreateCommandObjects() {
 void MyD3DApp::CreateSwapChain() {
     swapChain.Reset();
 
-    DXGI_SWAP_CHAIN_DESC desc;
+    DXGI_SWAP_CHAIN_DESC desc{};
     desc.BufferDesc.Width = GetClientWidth();
     desc.BufferDesc.Height = GetClientHeight();
     desc.BufferDesc.RefreshRate.Numerator = 60;
@@ -121,18 +123,104 @@ void MyD3DApp::CreateSwapChain() {
     desc.SampleDesc.Quality = msaa4xEnabled ? (msaa4xQuality - 1) : 0;
 
     desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    desc.BufferCount = swapChainBufferCount;
+    desc.BufferCount = s_swapChainBufferCount;
 
     desc.OutputWindow = GetWindowHandle();
     desc.Windowed = true;
-    desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+    desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     ThrowIfFailed(
         dxgiFactory->CreateSwapChain(commandQueue.Get(), &desc, swapChain.GetAddressOf()));
 }
 
-void MyD3DApp::CreateDescriptorHeaps() {}
+void MyD3DApp::CreateDescriptorHeaps() {
+    D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc{};
+    rtvHeapDesc.NumDescriptors = s_swapChainBufferCount;
+    rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+    rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    rtvHeapDesc.NodeMask = 0;
+
+    ThrowIfFailed(d3dDevice->CreateDescriptorHeap(&rtvHeapDesc,
+                                                  IID_PPV_ARGS(rtvDescriptorHeap.GetAddressOf())));
+
+    D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc{};
+    dsvHeapDesc.NumDescriptors = 1;
+    dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+    dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    dsvHeapDesc.NodeMask = 0;
+
+    ThrowIfFailed(d3dDevice->CreateDescriptorHeap(&dsvHeapDesc,
+                                                  IID_PPV_ARGS(dsvDescriptorHeap.GetAddressOf())));
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE MyD3DApp::GetCurrentBackBufferView() const {
+    return CD3DX12_CPU_DESCRIPTOR_HANDLE(GetStartSwapChainBufferView(),
+                                         currBackBuffer,
+                                         rtvDescriptorSize);
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE MyD3DApp::GetStartSwapChainBufferView() const {
+    return rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE MyD3DApp::GetDepthStencilView() const {
+    return dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+}
+
+void MyD3DApp::CreateBackBufferViews() {
+    CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(GetStartSwapChainBufferView());
+
+    for (UINT i = 0; i < s_swapChainBufferCount; ++i) {
+        // Get the i-th buffer in the swap chain
+        ThrowIfFailed(swapChain->GetBuffer(i, IID_PPV_ARGS(swapChainBuffers[i].GetAddressOf())));
+
+        // Create an RTV to it
+        d3dDevice->CreateRenderTargetView(swapChainBuffers[i].Get(), nullptr, rtv);
+
+        // Next entry in descriptor heap
+        rtv.Offset(1, rtvDescriptorSize);
+    }
+}
+
+void MyD3DApp::CreateDepthStencilView() {
+    D3D12_RESOURCE_DESC dsvDesc{};
+    dsvDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    dsvDesc.Alignment = 0;
+    dsvDesc.Width = GetClientWidth();
+    dsvDesc.Height = GetClientHeight();
+    dsvDesc.DepthOrArraySize = 1;
+    dsvDesc.MipLevels = 1;
+    dsvDesc.Format = depthStencilFormat;
+    dsvDesc.SampleDesc.Count = msaa4xEnabled ? 4 : 1;
+    dsvDesc.SampleDesc.Quality = msaa4xEnabled ? (msaa4xQuality - 1) : 0;
+    dsvDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    dsvDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+    D3D12_CLEAR_VALUE optClear;
+    optClear.Format = depthStencilFormat;
+    optClear.DepthStencil.Depth = 1.0f;
+    optClear.DepthStencil.Stencil = 0;
+
+    auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+
+    ThrowIfFailed(
+        d3dDevice->CreateCommittedResource(&heapProp,
+                                           D3D12_HEAP_FLAG_NONE,
+                                           &dsvDesc,
+                                           D3D12_RESOURCE_STATE_COMMON,
+                                           &optClear,
+                                           IID_PPV_ARGS(depthStencilBuffer.GetAddressOf())));
+
+    d3dDevice->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, GetDepthStencilView());
+
+    // Transition the resource from init state to be used as a depth buffer
+    commandList->ResourceBarrier(
+        1,
+        &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer.Get(),
+                                              D3D12_RESOURCE_STATE_COMMON,
+                                              D3D12_RESOURCE_STATE_DEPTH_WRITE));
+}
 
 void MyD3DApp::SetMsaa4x(bool state) {
     if (state != msaa4xEnabled) {
