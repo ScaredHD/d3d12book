@@ -26,9 +26,28 @@ void MyD3DApp::OnKeyUp() {
 }
 
 void MyD3DApp::OnResize() {
-    CreateBackBufferViews();
-    CreateDepthStencilView();
+    // Flush before changing any resources.
+    // FlushCommandQueue();
+
+    // ThrowIfFailed(commandList->Reset(commandAllocator.Get(), nullptr));
+
+    // CreateBackBufferViews();
+    // CreateDepthStencilView();
     MyApp::OnResize();
+}
+
+void MyD3DApp::Initialize() {
+    if (!InitializeWindow(L"My D3D App")) {
+        throw std::runtime_error("Failed to initialize window");
+    }
+
+    if (!InitializeD3D()) {
+        throw std::runtime_error("Failed to initialize D3D");
+    }
+
+    timer.Reset();
+
+    OnInitialize();
 }
 
 bool MyD3DApp::InitializeD3D() {
@@ -89,12 +108,24 @@ bool MyD3DApp::InitializeD3D() {
     return true;
 }
 
+void MyD3DApp::Update() {
+    timer.Tick();
+
+    if (!isPaused) {
+        CalculateFrameStats();
+        // OutputDebugString(L"CalculateFrameStats\n");
+    } else {
+        Sleep(100);
+    }
+}
+
 void MyD3DApp::CreateCommandObjects() {
-    D3D12_COMMAND_QUEUE_DESC desc{};
-    desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-    desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+    D3D12_COMMAND_QUEUE_DESC queueDesc{};
+    queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     ThrowIfFailed(
-        d3dDevice->CreateCommandQueue(&desc, IID_PPV_ARGS(commandQueue.ReleaseAndGetAddressOf())));
+        d3dDevice->CreateCommandQueue(&queueDesc,
+                                      IID_PPV_ARGS(commandQueue.ReleaseAndGetAddressOf())));
 
     ThrowIfFailed(d3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,
                                                     IID_PPV_ARGS(commandAllocator.GetAddressOf())));
@@ -215,11 +246,10 @@ void MyD3DApp::CreateDepthStencilView() {
     d3dDevice->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, GetDepthStencilView());
 
     // Transition the resource from init state to be used as a depth buffer
-    commandList->ResourceBarrier(
-        1,
-        &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer.Get(),
-                                              D3D12_RESOURCE_STATE_COMMON,
-                                              D3D12_RESOURCE_STATE_DEPTH_WRITE));
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer.Get(),
+                                                        D3D12_RESOURCE_STATE_COMMON,
+                                                        D3D12_RESOURCE_STATE_DEPTH_WRITE);
+    commandList->ResourceBarrier(1, &barrier);
 }
 
 void MyD3DApp::SetMsaa4x(bool state) {
@@ -228,5 +258,27 @@ void MyD3DApp::SetMsaa4x(bool state) {
 
         CreateSwapChain();
         OnResize();
+    }
+}
+
+void MyD3DApp::CalculateFrameStats() {
+    ++frameCount;
+    // OutputDebugString(std::to_wstring(timer.TotalTimeFromStart()).c_str());
+
+    // Do calculations every one second
+    if (auto diff = timer.TotalTimeFromStart() - timeElapsed; diff > 1.0f) {
+        float fps = frameCount;
+        float frameTime = 1000.0f / fps;
+
+        auto fpsStr = std::to_wstring(fps);
+        auto frameTimeStr = std::to_wstring(frameTime);
+
+        std::wstring windowText = GetWindowName();
+        windowText += L"  fps: " + fpsStr;
+        windowText += L"  frame time: " + frameTimeStr;
+        SetWindowText(GetWindowHandle(), windowText.c_str());
+
+        frameCount = 0;
+        timeElapsed += diff;
     }
 }

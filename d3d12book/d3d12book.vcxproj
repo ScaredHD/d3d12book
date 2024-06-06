@@ -139,11 +139,13 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyD3DApp.cpp" />
+    <ClCompile Include="MyTimer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\d3dUtil.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyD3DApp.h" />
+    <ClInclude Include="MyTimer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

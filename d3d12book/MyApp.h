@@ -14,7 +14,7 @@ class MyApp {
           pCmdLine{pCmdLine},
           nCmdShow{nCmdShow} {}
 
-    bool InitializeWindow(std::wstring windowName);
+    bool InitializeWindow(const std::wstring &windowName);
 
     void ShowWindow();
 
@@ -23,12 +23,15 @@ class MyApp {
     virtual LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     unsigned int GetClientWidth() const { return clientWidth; }
+
     unsigned int GetClientHeight() const { return clientHeight; }
 
   protected:
     virtual void OnMouseDown(int xPos, int yPos) {}
 
     virtual void OnMouseUp(int xPos, int yPos) {}
+
+    virtual void OnMouseMove(int xPos, int yPos) {}
 
     virtual void OnKeyDown() {}
 
@@ -42,9 +45,12 @@ class MyApp {
 
     auto GetWindowHandle() const { return hwnd; }
 
+    auto GetWindowName() const { return windowName; }
+
   private:
     // ReSharper disable once IdentifierTypo
     HWND hwnd;
+    std::wstring windowName;
 
     UINT clientWidth = 800;
     UINT clientHeight = 600;

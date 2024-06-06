@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MyApp.h"
+#include "MyTimer.h"
 
 #include "Common/d3dUtil.h"
 
@@ -14,13 +15,17 @@ class MyD3DApp : public MyApp {
     MyD3DApp(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
         : MyApp(hInstance, hPrevInstance, pCmdLine, nCmdShow) {}
 
-    bool InitializeD3D();
+    void Initialize();
 
-    void Update() {}
+    virtual bool InitializeD3D();
+
+    virtual void Update();
 
     LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
   protected:
+    virtual void OnInitialize() {}
+
     void OnMouseDown(int xPos, int yPos) override;
 
     void OnMouseUp(int xPos, int yPos) override;
@@ -49,7 +54,11 @@ class MyD3DApp : public MyApp {
 
     void SetMsaa4x(bool state);
 
+    void CalculateFrameStats();
+
   private:
+    bool isPaused = false;
+
     Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
     Microsoft::WRL::ComPtr<ID3D12Device> d3dDevice;
     Microsoft::WRL::ComPtr<ID3D12Fence> fence;
@@ -75,4 +84,9 @@ class MyD3DApp : public MyApp {
 
     Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer;
     Microsoft::WRL::ComPtr<ID3D12Resource> swapChainBuffers[s_swapChainBufferCount];
+
+    // Game stats
+    MyTimer timer;
+    int frameCount = 0;
+    float timeElapsed = 0.0f;
 };

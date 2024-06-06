@@ -22,7 +22,9 @@ LRESULT MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-bool MyApp::InitializeWindow(std::wstring windowName) {
+bool MyApp::InitializeWindow(const std::wstring& initWindowName) {
+    windowName = initWindowName;
+
     WNDCLASS wc;
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc = MainWndProc;
@@ -70,7 +72,7 @@ void MyApp::ShowWindow() {
 
 bool MyApp::PollEvents() {
     MSG msg;
-    while (GetMessage(&msg, NULL, 0, 0)) {
+    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
