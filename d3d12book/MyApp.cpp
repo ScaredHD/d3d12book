@@ -87,21 +87,21 @@ LRESULT MyApp::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             return 0;
 
         case WM_SIZE:
-            OnResize();
+            MyApp::OnResize();
             return 0;
 
         case WM_LBUTTONDOWN:
             mouseDown = true;
-            OnMouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            MyApp::OnMouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             return 0;
 
         case WM_LBUTTONUP:
             mouseDown = false;
-            OnMouseUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            MyApp::OnMouseUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             return 0;
 
         case WM_KEYDOWN:
-            OnKeyDown();
+            MyApp::OnKeyDown();
             return 0;
     }
 
