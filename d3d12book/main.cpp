@@ -16,7 +16,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
         while (d3dApp.PollEvents()) {
             d3dApp.Update();
-
+            d3dApp.Draw();
         }
 
     } catch (const DxException& e) {
