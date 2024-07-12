@@ -92,12 +92,14 @@ LRESULT MyApp::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
         case WM_LBUTTONDOWN:
             mouseDown = true;
-            MyApp::OnMouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             return 0;
 
         case WM_LBUTTONUP:
             mouseDown = false;
-            MyApp::OnMouseUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            return 0;
+
+        case WM_MOUSEMOVE:
+            mousePos = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
             return 0;
 
         case WM_KEYDOWN:

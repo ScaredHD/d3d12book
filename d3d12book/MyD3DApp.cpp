@@ -50,6 +50,8 @@ void MyD3DApp::ExecuteCommandList() {
 }
 
 void MyD3DApp::OnResize() {
+    MyApp::OnResize();
+
     assert(d3dDevice);
     assert(swapChain);
     assert(commandAllocator);
@@ -83,8 +85,6 @@ void MyD3DApp::OnResize() {
     FlushCommandQueue();
 
     UpdateViewport();
-
-    MyApp::OnResize();
 }
 
 void MyD3DApp::Initialize() {
@@ -165,9 +165,15 @@ void MyD3DApp::Update() {
 
     if (!isPaused) {
         CalculateFrameStats();
+        OnUpdate();
     } else {
         Sleep(100);
     }
+}
+
+void MyD3DApp::SetViewportAndScissorRects() {
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
 }
 
 void MyD3DApp::Draw() {
@@ -179,8 +185,7 @@ void MyD3DApp::Draw() {
                                                            D3D12_RESOURCE_STATE_RENDER_TARGET);
     commandList->ResourceBarrier(1, &transition);
 
-    commandList->RSSetViewports(1, &viewport);
-    commandList->RSSetScissorRects(1, &scissorRect);
+    SetViewportAndScissorRects();
 
     commandList->ClearRenderTargetView(GetCurrentBackBufferView(),
                                        DirectX::Colors::LightSteelBlue,
@@ -192,6 +197,7 @@ void MyD3DApp::Draw() {
                                        0,
                                        0,
                                        nullptr);
+
     auto rtv = GetCurrentBackBufferView();
     auto dsv = GetDepthStencilView();
     commandList->OMSetRenderTargets(1, &rtv, true, &dsv);
@@ -288,8 +294,16 @@ void MyD3DApp::FlushCommandQueue() {
     }
 }
 
+void MyD3DApp::SwapBuffers() {
+    currentBackBuffer = (currentBackBuffer + 1) % s_swapChainBufferCount;
+}
+
 ID3D12Resource* MyD3DApp::GetCurrentBackBuffer() const {
     return swapChainBuffers[currentBackBuffer].Get();
+}
+
+void MyD3DApp::SetCurrentBackBufferIndex(int buffer) {
+    currentBackBuffer = buffer;
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE MyD3DApp::GetCurrentBackBufferView() const {

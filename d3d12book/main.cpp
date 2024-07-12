@@ -2,21 +2,26 @@
 #define UNICODE
 #endif
 
-#include <iostream>
-#include <stdexcept>
+#define DEBUG
 
-#include "MyD3DApp.h"
+#include <iostream>
+
+#include "MyBoxApp.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
-    MyD3DApp d3dApp(hInstance, hPrevInstance, pCmdLine, nCmdShow);
+#if defined(DEBUG) | defined(_DEBUG)
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
+    MyBoxApp app(hInstance, hPrevInstance, pCmdLine, nCmdShow);
 
     try {
-        d3dApp.Initialize();
-        d3dApp.ShowWindow();
+        app.Initialize();
+        app.ShowWindow();
 
-        while (d3dApp.PollEvents()) {
-            d3dApp.Update();
-            d3dApp.Draw();
+        while (app.PollEvents()) {
+            app.Update();
+            app.Draw();
         }
 
     } catch (const DxException& e) {

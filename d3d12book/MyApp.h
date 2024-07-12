@@ -26,6 +26,8 @@ class MyApp {
 
     unsigned int GetClientHeight() const { return clientHeight; }
 
+    float GetAspectRatio() const { return static_cast<float>(clientWidth) / clientHeight; }
+
   protected:
     virtual void OnMouseDown(int xPos, int yPos) {}
 
@@ -47,6 +49,10 @@ class MyApp {
 
     auto GetWindowName() const { return windowName; }
 
+    int GetMouseX() const { return mousePos.x; }
+
+    int GetMouseY() const { return mousePos.y; }
+
   private:
     // ReSharper disable once IdentifierTypo
     HWND hwnd;
@@ -63,4 +69,5 @@ class MyApp {
     bool isRunning;
 
     bool mouseDown;
+    POINT mousePos;
 };
