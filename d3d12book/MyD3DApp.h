@@ -19,7 +19,7 @@ class MyD3DApp : public MyApp {
 
     virtual bool InitializeD3D();
 
-    virtual void Update();
+    void Update();
 
     virtual void Draw();
 
@@ -103,6 +103,12 @@ class MyD3DApp : public MyApp {
 
     ID3D12CommandQueue* GetCommandQueue() const { return commandQueue.Get(); }
 
+    ID3D12Fence* GetFence() const { return fence.Get(); }
+
+    UINT64 GetFenceValue() const { return fence->GetCompletedValue(); }
+
+    UINT64 nextFence = 0;
+
   private:
     bool isPaused = false;
 
@@ -121,7 +127,6 @@ class MyD3DApp : public MyApp {
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 
-    UINT64 fencePoint = 0;
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
     DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;

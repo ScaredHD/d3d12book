@@ -284,11 +284,11 @@ void MyD3DApp::CreateDescriptorHeaps() {
 }
 
 void MyD3DApp::FlushCommandQueue() {
-    ThrowIfFailed(commandQueue->Signal(fence.Get(), ++fencePoint));
+    ThrowIfFailed(commandQueue->Signal(fence.Get(), ++nextFence));
 
-    if (fence->GetCompletedValue() < fencePoint) {
+    if (fence->GetCompletedValue() < nextFence) {
         auto eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
-        ThrowIfFailed(fence->SetEventOnCompletion(fencePoint, eventHandle));
+        ThrowIfFailed(fence->SetEventOnCompletion(nextFence, eventHandle));
         WaitForSingleObject(eventHandle, INFINITE);
         CloseHandle(eventHandle);
     }

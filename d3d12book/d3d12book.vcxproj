@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClInclude Include="..\Common\d3dUtil.h" />
     <ClInclude Include="..\Common\MathHelper.h" />
+    <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyBoxApp.h" />
     <ClInclude Include="MyD3DApp.h" />

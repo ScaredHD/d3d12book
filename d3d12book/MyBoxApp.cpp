@@ -26,6 +26,9 @@ void MyBoxApp::OnInitialize() {
 void MyBoxApp::OnResize() {
     MyD3DApp::OnResize();
 
+
+
+
     XMMATRIX m = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, GetAspectRatio(), 1.0f, 1000.0f);
     XMStoreFloat4x4(&matProjection, m);
 }
@@ -111,7 +114,7 @@ void MyBoxApp::Draw() {
     ID3D12DescriptorHeap* descriptorHeaps[] = {cbvHeap.Get()};
     GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-    GetCommandList()->SetGraphicsRootSignature(rootSignitature.Get());
+    GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
 
     auto vbv = boxGeo->VertexBufferView();
     GetCommandList()->IASetVertexBuffers(0, 1, &vbv);
@@ -222,7 +225,7 @@ void MyBoxApp::BuildRootSignature() {
         GetDevice()->CreateRootSignature(0,
                                          serializedRootSig->GetBufferPointer(),
                                          serializedRootSig->GetBufferSize(),
-                                         IID_PPV_ARGS(rootSignitature.ReleaseAndGetAddressOf())));
+                                         IID_PPV_ARGS(rootSignature.ReleaseAndGetAddressOf())));
 }
 
 void MyBoxApp::BuildShadersAndInputLayout() {
@@ -320,7 +323,7 @@ void MyBoxApp::BuildPSO() {
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
     ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
     psoDesc.InputLayout = {inputLayout.data(), (UINT)inputLayout.size()};
-    psoDesc.pRootSignature = rootSignitature.Get();
+    psoDesc.pRootSignature = rootSignature.Get();
     psoDesc.VS = {reinterpret_cast<BYTE*>(vertexShaderByteCode->GetBufferPointer()),
                   vertexShaderByteCode->GetBufferSize()};
     psoDesc.PS = {reinterpret_cast<BYTE*>(pixelShaderByteCode->GetBufferPointer()),

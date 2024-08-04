@@ -84,7 +84,7 @@ class MyBoxApp final : public MyD3DApp {
     void BuildBoxGeometry();
     void BuildPSO();
 
-    Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignitature;
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> cbvHeap;
 
     std::unique_ptr<UploadBuffer<ConstantBufferObject>> uploader;
@@ -97,9 +97,6 @@ class MyBoxApp final : public MyD3DApp {
     std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
 
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pso;
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferGPU{};
-    Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferUploader{};
 
     struct {
         float radius = 5.0f;
