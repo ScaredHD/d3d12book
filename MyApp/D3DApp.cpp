@@ -52,7 +52,7 @@ void D3DApp::ExecuteCommandList() {
 void D3DApp::OnResize() {
     MyApp::OnResize();
 
-    assert(d3dDevice);
+    assert(device);
     assert(swapChain_);
     assert(commandAllocator);
 
@@ -65,7 +65,7 @@ void D3DApp::OnResize() {
 
     ThrowIfFailed(swapChain_->Resize(GetClientWidth(), GetClientHeight()));
 
-    swapChain_->CreateRtvs(d3dDevice.Get());
+    swapChain_->CreateRtvs(device.Get());
 
     CreateDepthStencilBuffer();
 
@@ -108,7 +108,7 @@ bool D3DApp::InitializeD3D() {
 
     HRESULT hardwareResult = D3D12CreateDevice(nullptr,  // default adapter
                                                D3D_FEATURE_LEVEL_11_0,
-                                               IID_PPV_ARGS(d3dDevice.ReleaseAndGetAddressOf()));
+                                               IID_PPV_ARGS(device.ReleaseAndGetAddressOf()));
 
     // Fallback to WARP device
     if (FAILED(hardwareResult)) {
@@ -117,11 +117,11 @@ bool D3DApp::InitializeD3D() {
 
         ThrowIfFailed(D3D12CreateDevice(warpAdapter.Get(),
                                         D3D_FEATURE_LEVEL_11_0,
-                                        IID_PPV_ARGS(d3dDevice.ReleaseAndGetAddressOf())));
+                                        IID_PPV_ARGS(device.ReleaseAndGetAddressOf())));
     }
 
     // Fence
-    ThrowIfFailed(d3dDevice->CreateFence(0,
+    ThrowIfFailed(device->CreateFence(0,
                                          D3D12_FENCE_FLAG_NONE,
                                          IID_PPV_ARGS(fence.ReleaseAndGetAddressOf())));
 
@@ -131,7 +131,7 @@ bool D3DApp::InitializeD3D() {
     qualityLevels.SampleCount = 4;
     qualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
     qualityLevels.NumQualityLevels = 0;
-    ThrowIfFailed(d3dDevice->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS,
+    ThrowIfFailed(device->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS,
                                                  &qualityLevels,
                                                  sizeof(qualityLevels)));
 
@@ -205,13 +205,13 @@ void D3DApp::CreateCommandObjects() {
     queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     ThrowIfFailed(
-        d3dDevice->CreateCommandQueue(&queueDesc,
+        device->CreateCommandQueue(&queueDesc,
                                       IID_PPV_ARGS(commandQueue.ReleaseAndGetAddressOf())));
 
-    ThrowIfFailed(d3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,
+    ThrowIfFailed(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,
                                                     IID_PPV_ARGS(commandAllocator.GetAddressOf())));
 
-    ThrowIfFailed(d3dDevice->CreateCommandList(0,
+    ThrowIfFailed(device->CreateCommandList(0,
                                                D3D12_COMMAND_LIST_TYPE_DIRECT,
                                                commandAllocator.Get(),
                                                nullptr,
@@ -240,7 +240,7 @@ void D3DApp::CreateSwapChain() {
     desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    swapChain_ = std::make_unique<SwapChain<2>>(d3dDevice.Get(),
+    swapChain_ = std::make_unique<SwapChain<2>>(device.Get(),
                                                 dxgiFactory.Get(),
                                                 commandQueue.Get(),
                                                 desc);
@@ -253,7 +253,7 @@ void D3DApp::CreateDsvHeaps() {
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     desc.NodeMask = 0;
 
-    dsvHeap_ = std::make_unique<DescriptorHeap>(d3dDevice.Get(), desc);
+    dsvHeap_ = std::make_unique<DescriptorHeap>(device.Get(), desc);
 }
 
 void D3DApp::FlushCommandQueue() {
@@ -277,7 +277,7 @@ void D3DApp::CreateDepthStencilBuffer() {
     desc.Height = GetClientHeight();
     desc.DepthOrArraySize = 1;
     desc.MipLevels = 1;
-    // depthStencilDesc.Format = depthStencilFormat;
+    // depthStencilDesc.Format = depthStencilFormat_;
     desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     desc.SampleDesc.Count = msaa4xEnabled ? 4 : 1;
     desc.SampleDesc.Quality = msaa4xEnabled ? (msaa4xQuality - 1) : 0;
@@ -291,7 +291,7 @@ void D3DApp::CreateDepthStencilBuffer() {
 
     auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
-    ThrowIfFailed(d3dDevice->CreateCommittedResource(
+    ThrowIfFailed(device->CreateCommittedResource(
         &heapProp,
         D3D12_HEAP_FLAG_NONE,
         &desc,
@@ -307,7 +307,7 @@ void D3DApp::CreateDepthStencilView() {
     desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     desc.Texture2D.MipSlice = 0;
 
-    d3dDevice->CreateDepthStencilView(depthStencilBuffer_.Get(), &desc, dsvHeap_->GetDescriptor(0));
+    device->CreateDepthStencilView(depthStencilBuffer_.Get(), &desc, dsvHeap_->GetDescriptor(0));
 
     Transition(depthStencilBuffer_.Get(),
                D3D12_RESOURCE_STATE_COMMON,

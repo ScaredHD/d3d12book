@@ -65,7 +65,24 @@ class D3DApp : public MyApp {
 
     void Transition(ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
 
-    DXGI_FORMAT GetDepthStencilFormat() const { return depthStencilFormat; }
+    Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
+    Microsoft::WRL::ComPtr<ID3D12Device> device;
+
+    Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
+
+    DXGI_FORMAT backBufferFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
+    std::unique_ptr<SwapChain<2>> swapChain_;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer_;
+    DXGI_FORMAT depthStencilFormat_ = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    std::unique_ptr<DescriptorHeap> dsvHeap_;
+
+    bool isPaused = false;
+
+    UINT64 nextFence = 0;
+    Microsoft::WRL::ComPtr<ID3D12Fence> fence;
 
     bool Msaa4xEnabled() const { return msaa4xEnabled; }
 
@@ -73,51 +90,16 @@ class D3DApp : public MyApp {
 
     UINT GetMsaa4xQuality() const { return msaa4xQuality; }
 
+    UINT msaa4xQuality = {};
+    bool msaa4xEnabled = false;
+
+    D3D12_VIEWPORT viewport = {};
+    RECT scissorRect = {};
+
     // Game stats
     void CalculateFrameStats();
 
     MyTimer timer;
     int frameCount = 0;
     float timeElapsed = 0.0f;
-
-    ID3D12Device* GetDevice() const { return d3dDevice.Get(); }
-
-    ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
-
-    ID3D12CommandAllocator* GetCommandAllocator() const { return commandAllocator.Get(); }
-
-    ID3D12CommandQueue* GetCommandQueue() const { return commandQueue.Get(); }
-
-    ID3D12Fence* GetFence() const { return fence.Get(); }
-
-    UINT64 GetFenceValue() const { return fence->GetCompletedValue(); }
-
-    UINT64 nextFence = 0;
-
-    SwapChain<2>* GetSwapChain() const { return swapChain_.get(); }
-
-    ID3D12Resource* GetDepthStencilBuffer() const { return depthStencilBuffer_.Get(); }
-
-    bool isPaused = false;
-
-    Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
-    Microsoft::WRL::ComPtr<ID3D12Device> d3dDevice;
-    Microsoft::WRL::ComPtr<ID3D12Fence> fence;
-
-    DXGI_FORMAT backBufferFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
-    std::unique_ptr<SwapChain<2>> swapChain_;
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer_;
-    DXGI_FORMAT depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    std::unique_ptr<DescriptorHeap> dsvHeap_;
-
-    UINT msaa4xQuality = {};
-    bool msaa4xEnabled = false;
-
-    Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
-
-    D3D12_VIEWPORT viewport = {};
-    RECT scissorRect = {};
 };
