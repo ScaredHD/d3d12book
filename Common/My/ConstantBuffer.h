@@ -2,16 +2,16 @@
 #include "Common/d3dUtil.h"
 
 template <typename T>
-class CBuffer {
+class Cbuffer {
   public:
-    CBuffer(ID3D12Device* device, UINT elementCount);
+    Cbuffer(ID3D12Device* device, UINT elementCount);
 
-    CBuffer(const CBuffer& other) = delete;
-    CBuffer(CBuffer&& other) noexcept = delete;
-    CBuffer& operator=(const CBuffer& other) = delete;
-    CBuffer& operator=(CBuffer&& other) noexcept = delete;
+    Cbuffer(const Cbuffer& other) = delete;
+    Cbuffer(Cbuffer&& other) noexcept = delete;
+    Cbuffer& operator=(const Cbuffer& other) = delete;
+    Cbuffer& operator=(Cbuffer&& other) noexcept = delete;
 
-    ~CBuffer() {
+    ~Cbuffer() {
         if (uploadBuffer_) {
             uploadBuffer_->Unmap(0, nullptr);
         }
@@ -33,7 +33,7 @@ class CBuffer {
 };
 
 template <typename T>
-CBuffer<T>::CBuffer(ID3D12Device* device, UINT elementCount) {
+Cbuffer<T>::Cbuffer(ID3D12Device* device, UINT elementCount) {
     elementByteSize_ = d3dUtil::CalcConstantBufferByteSize(sizeof(T));
 
     auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
