@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include "App.h"
 #include "Timer.h"
 
@@ -12,7 +14,6 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
 #pragma comment(lib, "dxgi.lib")
-
 
 class D3DApp : public MyApp {
   public:
@@ -93,7 +94,10 @@ class D3DApp : public MyApp {
 
     UINT64 nextFence = 0;
 
-  private:
+    SwapChain<2>* GetSwapChain() const { return swapChain_.get(); }
+
+    ID3D12Resource* GetDepthStencilBuffer() const { return depthStencilBuffer_.Get(); }
+
     bool isPaused = false;
 
     Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
@@ -103,7 +107,7 @@ class D3DApp : public MyApp {
     DXGI_FORMAT backBufferFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
     std::unique_ptr<SwapChain<2>> swapChain_;
 
-    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer;
+    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer_;
     DXGI_FORMAT depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
     std::unique_ptr<DescriptorHeap> dsvHeap_;
 

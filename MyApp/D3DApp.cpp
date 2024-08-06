@@ -268,7 +268,7 @@ void D3DApp::FlushCommandQueue() {
 }
 
 void D3DApp::CreateDepthStencilBuffer() {
-    depthStencilBuffer.Reset();
+    depthStencilBuffer_.Reset();
 
     D3D12_RESOURCE_DESC desc{};
     desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -297,7 +297,7 @@ void D3DApp::CreateDepthStencilBuffer() {
         &desc,
         D3D12_RESOURCE_STATE_COMMON,
         &optClear,
-        IID_PPV_ARGS(depthStencilBuffer.ReleaseAndGetAddressOf())));
+        IID_PPV_ARGS(depthStencilBuffer_.ReleaseAndGetAddressOf())));
 }
 
 void D3DApp::CreateDepthStencilView() {
@@ -307,9 +307,9 @@ void D3DApp::CreateDepthStencilView() {
     desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     desc.Texture2D.MipSlice = 0;
 
-    d3dDevice->CreateDepthStencilView(depthStencilBuffer.Get(), &desc, dsvHeap_->GetDescriptor(0));
+    d3dDevice->CreateDepthStencilView(depthStencilBuffer_.Get(), &desc, dsvHeap_->GetDescriptor(0));
 
-    Transition(depthStencilBuffer.Get(),
+    Transition(depthStencilBuffer_.Get(),
                D3D12_RESOURCE_STATE_COMMON,
                D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
