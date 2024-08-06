@@ -15,9 +15,9 @@ struct ConstantBufferObject {
     DirectX::XMFLOAT4X4 modelViewProj;
 };
 
-class MyBoxApp final : public D3DApp {
+class BoxApp final : public D3DApp {
   public:
-    MyBoxApp(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+    BoxApp(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
         : D3DApp(hInstance, hPrevInstance, pCmdLine, nCmdShow) {}
 
     void Draw() override;
@@ -40,32 +40,32 @@ class MyBoxApp final : public D3DApp {
     void BuildRootSignature();
     void BuildShadersAndInputLayout();
     void BuildBoxGeometry();
-    void BuildPSO();
+    void BuildPso();
 
-    Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> cbvHeap;
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> cbvHeap_;
 
-    std::unique_ptr<UploadBuffer<ConstantBufferObject>> uploader;
+    std::unique_ptr<UploadBuffer<ConstantBufferObject>> uploader_;
 
-    std::unique_ptr<MeshGeometry> boxGeo;
+    std::unique_ptr<MeshGeometry> boxGeo_;
 
-    Microsoft::WRL::ComPtr<ID3DBlob> vertexShaderByteCode;
-    Microsoft::WRL::ComPtr<ID3DBlob> pixelShaderByteCode;
+    Microsoft::WRL::ComPtr<ID3DBlob> vertexShaderByteCode_;
+    Microsoft::WRL::ComPtr<ID3DBlob> pixelShaderByteCode_;
 
-    std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
+    std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout_;
 
-    Microsoft::WRL::ComPtr<ID3D12PipelineState> pso;
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> pso_;
 
     struct {
         float radius = 5.0f;
         float phi = DirectX::XM_PIDIV4;
         float theta = 1.5f * DirectX::XM_PI;
-    } cameraPose;
+    } cameraPose_;
 
-    DirectX::XMFLOAT4X4 matModel = MathHelper::Identity4x4();
-    DirectX::XMFLOAT4X4 matView = MathHelper::Identity4x4();
-    DirectX::XMFLOAT4X4 matProjection = MathHelper::Identity4x4();
+    DirectX::XMFLOAT4X4 matModel_ = MathHelper::Identity4x4();
+    DirectX::XMFLOAT4X4 matView_ = MathHelper::Identity4x4();
+    DirectX::XMFLOAT4X4 matProjection_ = MathHelper::Identity4x4();
 
-    int lastMousePosX;
-    int lastMousePosY;
+    int lastMousePosX_;
+    int lastMousePosY_;
 };

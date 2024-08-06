@@ -14,7 +14,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-    auto app = std::make_unique<MyBoxApp>(hInstance, hPrevInstance, pCmdLine, nCmdShow);
+    auto app = std::make_unique<BoxApp>(hInstance, hPrevInstance, pCmdLine, nCmdShow);
 
     try {
         app->Initialize();
