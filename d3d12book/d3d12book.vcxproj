@@ -59,15 +59,19 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -139,18 +143,17 @@
     <ClCompile Include="..\Common\MathHelper.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyApp.cpp" />
-    <ClCompile Include="MyBoxApp.cpp" />
-    <ClCompile Include="MyD3DApp.cpp" />
-    <ClCompile Include="MyTimer.cpp" />
+    <ClCompile Include="BoxApp.cpp" />
+    <ClCompile Include="D3DApp.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\d3dUtil.h" />
     <ClInclude Include="..\Common\MathHelper.h" />
-    <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="MyApp.h" />
-    <ClInclude Include="MyBoxApp.h" />
-    <ClInclude Include="MyD3DApp.h" />
-    <ClInclude Include="MyTimer.h" />
+    <ClInclude Include="BoxApp.h" />
+    <ClInclude Include="D3DApp.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="color.hlsl">

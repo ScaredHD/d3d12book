@@ -6,14 +6,17 @@
 
 #include <iostream>
 
-#include "MyBoxApp.h"
+#include "D3DApp.h"
+
+// #pragma comment(lib, "MyApp.lib")
+
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
 #if defined(DEBUG) | defined(_DEBUG)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-    MyBoxApp app(hInstance, hPrevInstance, pCmdLine, nCmdShow);
+    D3DApp app(hInstance, hPrevInstance, pCmdLine, nCmdShow);
 
     try {
         app.Initialize();

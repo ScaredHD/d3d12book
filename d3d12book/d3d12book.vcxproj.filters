@@ -21,16 +21,16 @@
     <ClCompile Include="MyApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyD3DApp.cpp">
+    <ClCompile Include="D3DApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\d3dUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyTimer.cpp">
+    <ClCompile Include="Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyBoxApp.cpp">
+    <ClCompile Include="BoxApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\MathHelper.cpp">
@@ -41,22 +41,19 @@
     <ClInclude Include="MyApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MyD3DApp.h">
+    <ClInclude Include="D3DApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\d3dUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MyTimer.h">
+    <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MyBoxApp.h">
+    <ClInclude Include="BoxApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\MathHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
