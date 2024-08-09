@@ -8,9 +8,9 @@ using Microsoft::WRL::ComPtr;
 void BoxApp::OnInitialize() {
     D3DApp::OnInitialize();
 
-    ThrowIfFailed(commandList->Reset(commandAllocator.Get(), nullptr));
+    ThrowIfFailed(commandList_->Reset(commandAllocator_.Get(), nullptr));
 
-    BuildDescriptorHeaps();
+    BuildCbvHeap();
     BuildConstantBuffers();
     BuildRootSignature();
     BuildShadersAndInputLayout();
@@ -18,7 +18,7 @@ void BoxApp::OnInitialize() {
     BuildPso();
 
     // Execute the initialization commands
-    ThrowIfFailed(commandList->Close());
+    ThrowIfFailed(commandList_->Close());
     ExecuteCommandList();
     FlushCommandQueue();
 }
@@ -69,7 +69,7 @@ void BoxApp::OnUpdate() {
 
     ConstantBufferObject obj;
     XMStoreFloat4x4(&obj.modelViewProj, XMMatrixTranspose(modelViewProj));
-    uploader_->CopyData(0, obj);
+    cbuffer_->Load(0, obj);
 }
 
 void BoxApp::OnMouseDown(int xPos, int yPos) {
@@ -83,9 +83,9 @@ void BoxApp::OnMouseUp(int xPos, int yPos) {
 }
 
 void BoxApp::Draw() {
-    ThrowIfFailed(commandAllocator->Reset());
+    ThrowIfFailed(commandAllocator_->Reset());
 
-    ThrowIfFailed(commandList->Reset(commandAllocator.Get(), pso_.Get()));
+    ThrowIfFailed(commandList_->Reset(commandAllocator_.Get(), pso_.Get()));
 
     SetViewportAndScissorRects();
 
@@ -93,45 +93,47 @@ void BoxApp::Draw() {
     auto transition = CD3DX12_RESOURCE_BARRIER::Transition(swapChain_->GetCurrentBackBuffer(),
                                                            D3D12_RESOURCE_STATE_PRESENT,
                                                            D3D12_RESOURCE_STATE_RENDER_TARGET);
-    commandList->ResourceBarrier(1, &transition);
+    commandList_->ResourceBarrier(1, &transition);
 
     auto rtv = swapChain_->GetCurrentBackBufferView();
-    commandList->ClearRenderTargetView(rtv, Colors::LightSteelBlue, 0, nullptr);
+    commandList_->ClearRenderTargetView(rtv, Colors::LightSteelBlue, 0, nullptr);
 
     auto dsv = dsvHeap_->GetDescriptor(0);
-    commandList->ClearDepthStencilView(dsv,
-                                       D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
-                                       1.0f,
-                                       0,
-                                       0,
-                                       nullptr);
+    commandList_->ClearDepthStencilView(dsv,
+                                        D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+                                        1.0f,
+                                        0,
+                                        0,
+                                        nullptr);
 
-    commandList->OMSetRenderTargets(1, &rtv, true, &dsv);
+    commandList_->OMSetRenderTargets(1, &rtv, true, &dsv);
 
-    ID3D12DescriptorHeap* descriptorHeaps[] = {cbvHeap_.Get()};
-    commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+    ID3D12DescriptorHeap* descriptorHeaps[] = {cbvHeap_->Get()};
+    commandList_->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-    commandList->SetGraphicsRootSignature(rootSignature_.Get());
+    commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 
-    auto vbv = boxGeo_->VertexBufferView();
-    commandList->IASetVertexBuffers(0, 1, &vbv);
+    auto vbv = vbuffer_->GetView();
+    commandList_->IASetVertexBuffers(0, 1, &vbv);
 
-    auto ibv = boxGeo_->IndexBufferView();
-    commandList->IASetIndexBuffer(&ibv);
+    auto ibv = ibuffer_->GetView();
+    commandList_->IASetIndexBuffer(&ibv);
 
-    commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    commandList_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     // Bind actual cbvHeap (argument) to root signature (parameter)
-    commandList->SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
+    commandList_->SetGraphicsRootDescriptorTable(
+        0,
+        cbvHeap_->Get()->GetGPUDescriptorHandleForHeapStart());
 
-    commandList->DrawIndexedInstanced(boxGeo_->DrawArgs["box"].IndexCount, 1, 0, 0, 0);
+    commandList_->DrawIndexedInstanced(boxGeo_->DrawArgs["box"].IndexCount, 1, 0, 0, 0);
 
     transition = CD3DX12_RESOURCE_BARRIER::Transition(swapChain_->GetCurrentBackBuffer(),
                                                       D3D12_RESOURCE_STATE_RENDER_TARGET,
                                                       D3D12_RESOURCE_STATE_PRESENT);
-    commandList->ResourceBarrier(1, &transition);
+    commandList_->ResourceBarrier(1, &transition);
 
-    ThrowIfFailed(commandList->Close());
+    ThrowIfFailed(commandList_->Close());
 
     ExecuteCommandList();
 
@@ -154,31 +156,19 @@ LRESULT BoxApp::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return D3DApp::HandleMessage(hwnd, msg, wParam, lParam);
 }
 
-void BoxApp::BuildDescriptorHeaps() {
+void BoxApp::BuildCbvHeap() {
     D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc{};
     cbvHeapDesc.NumDescriptors = 1;
     cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     cbvHeapDesc.NodeMask = 0;
 
-    ThrowIfFailed(
-        device->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(cbvHeap_.ReleaseAndGetAddressOf())));
+    cbvHeap_ = std::make_unique<DescriptorHeap>(device_.Get(), cbvHeapDesc);
 }
 
 void BoxApp::BuildConstantBuffers() {
-    uploader_ = std::make_unique<UploadBuffer<ConstantBufferObject>>(device.Get(), 1, true);
-
-    UINT bytesize = d3dUtil::CalcConstantBufferByteSize(sizeof(ConstantBufferObject));
-
-    D3D12_GPU_VIRTUAL_ADDRESS uploadBufferAddressGPU = uploader_->Resource()->GetGPUVirtualAddress();
-    int boxConstantBufferIndex = 0;
-    uploadBufferAddressGPU += boxConstantBufferIndex * bytesize;
-
-    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-    cbvDesc.BufferLocation = uploadBufferAddressGPU;
-    cbvDesc.SizeInBytes = bytesize;
-
-    device->CreateConstantBufferView(&cbvDesc, cbvHeap_->GetCPUDescriptorHandleForHeapStart());
+    cbuffer_ = std::make_unique<ConstantBuffer<ConstantBufferObject>>(device_.Get(), 1);
+    CreateConstantBufferViewOnHeap(device_.Get(), cbuffer_.get(), 0, cbvHeap_.get(), 0);
 }
 
 void BoxApp::BuildRootSignature() {
@@ -217,10 +207,10 @@ void BoxApp::BuildRootSignature() {
     ThrowIfFailed(result);
 
     ThrowIfFailed(
-        device->CreateRootSignature(0,
-                                    serializedRootSig->GetBufferPointer(),
-                                    serializedRootSig->GetBufferSize(),
-                                    IID_PPV_ARGS(rootSignature_.ReleaseAndGetAddressOf())));
+        device_->CreateRootSignature(0,
+                                     serializedRootSig->GetBufferPointer(),
+                                     serializedRootSig->GetBufferSize(),
+                                     IID_PPV_ARGS(rootSignature_.ReleaseAndGetAddressOf())));
 }
 
 void BoxApp::BuildShadersAndInputLayout() {
@@ -228,19 +218,19 @@ void BoxApp::BuildShadersAndInputLayout() {
     pixelShaderByteCode_ = d3dUtil::CompileShader(L"shaders.hlsl", nullptr, "PS", "ps_5_0");
 
     inputLayout_ = {{"POSITION",
-                    0,
-                    DXGI_FORMAT_R32G32B32_FLOAT,
-                    0,
-                    0,
-                    D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-                    0},
-                   {"COLOR",
-                    0,
-                    DXGI_FORMAT_R32G32B32A32_FLOAT,
-                    0,
-                    12,
-                    D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-                    0}};
+                     0,
+                     DXGI_FORMAT_R32G32B32_FLOAT,
+                     0,
+                     0,
+                     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+                     0},
+                    {"COLOR",
+                     0,
+                     DXGI_FORMAT_R32G32B32A32_FLOAT,
+                     0,
+                     12,
+                     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+                     0}};
 }
 
 void BoxApp::BuildBoxGeometry() {
@@ -277,41 +267,21 @@ void BoxApp::BuildBoxGeometry() {
     };
     // clang-format on
 
-    const UINT vbByteSize = vertices.size() * sizeof(Vertex);
-    const UINT ibByteSize = indices.size() * sizeof(std::uint16_t);
-
     boxGeo_ = std::make_unique<MeshGeometry>();
-    boxGeo_->Name = "boxGeo";
-
-    // Create VB and IB on CPU
-    ThrowIfFailed(D3DCreateBlob(vbByteSize, boxGeo_->VertexBufferCPU.ReleaseAndGetAddressOf()));
-    CopyMemory(boxGeo_->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
-
-    ThrowIfFailed(D3DCreateBlob(ibByteSize, boxGeo_->IndexBufferCPU.ReleaseAndGetAddressOf()));
-    CopyMemory(boxGeo_->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
-
-    // Create VB and IB on GPU
-    boxGeo_->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(device.Get(),
-                                                           commandList.Get(),
-                                                           vertices.data(),
-                                                           vbByteSize,
-                                                           boxGeo_->VertexBufferUploader);
-    boxGeo_->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(device.Get(),
-                                                          commandList.Get(),
-                                                          indices.data(),
-                                                          ibByteSize,
-                                                          boxGeo_->IndexBufferUploader);
-
-    boxGeo_->VertexByteStride = sizeof(Vertex);
-    boxGeo_->VertexBufferByteSize = vbByteSize;
-    boxGeo_->IndexFormat = DXGI_FORMAT_R16_UINT;
-    boxGeo_->IndexBufferByteSize = ibByteSize;
-
+    
     SubmeshGeometry submesh;
     submesh.IndexCount = (UINT)indices.size();
     submesh.StartIndexLocation = 0;
     submesh.BaseVertexLocation = 0;
     boxGeo_->DrawArgs["box"] = submesh;
+
+    UINT vbByteSize = vertices.size() * sizeof(Vertex);
+    vbuffer_ = std::make_unique<VertexBuffer>(sizeof(Vertex), vbByteSize);
+    vbuffer_->Load(device_.Get(), commandList_.Get(), vertices.data(), vbByteSize);
+
+    UINT ibByteSize = indices.size() * sizeof(std::uint16_t);
+    ibuffer_ = std::make_unique<IndexBuffer>(DXGI_FORMAT_R16_UINT, ibByteSize);
+    ibuffer_->Load(device_.Get(), commandList_.Get(), indices.data(), ibByteSize);
 }
 
 void BoxApp::BuildPso() {
@@ -330,10 +300,11 @@ void BoxApp::BuildPso() {
     psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     psoDesc.NumRenderTargets = 1;
     psoDesc.RTVFormats[0] = backBufferFormat_;
-    psoDesc.SampleDesc.Count = Msaa4xEnabled() ? 4 : 1;
-    psoDesc.SampleDesc.Quality = Msaa4xEnabled() ? GetMsaa4xQuality() - 1 : 0;
+    psoDesc.SampleDesc.Count = msaa4XEnabled_ ? 4 : 1;
+    psoDesc.SampleDesc.Quality = msaa4XEnabled_ ? msaa4XQuality_ - 1 : 0;
     psoDesc.DSVFormat = depthStencilFormat_;
 
     ThrowIfFailed(
-        device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(pso_.ReleaseAndGetAddressOf())));
+        device_->CreateGraphicsPipelineState(&psoDesc,
+                                             IID_PPV_ARGS(pso_.ReleaseAndGetAddressOf())));
 }

@@ -1,10 +1,10 @@
 #pragma once
 #include <WindowsX.h>
 
-#include "MyApp/D3DApp.h"
-
 #include "Common/d3dUtil.h"
-#include "Common/UploadBuffer.h"
+#include "ConstantBuffer.h"
+#include "DefaultBuffer.h"
+#include "MyApp/D3DApp.h"
 
 struct Vertex {
     DirectX::XMFLOAT3 pos;
@@ -35,7 +35,7 @@ class BoxApp final : public D3DApp {
 
     void OnMouseUp(int xPos, int yPos) override;
 
-    void BuildDescriptorHeaps();
+    void BuildCbvHeap();
     void BuildConstantBuffers();
     void BuildRootSignature();
     void BuildShadersAndInputLayout();
@@ -43,11 +43,13 @@ class BoxApp final : public D3DApp {
     void BuildPso();
 
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> cbvHeap_;
 
-    std::unique_ptr<UploadBuffer<ConstantBufferObject>> uploader_;
+    std::unique_ptr<ConstantBuffer<ConstantBufferObject>> cbuffer_;
+    std::unique_ptr<DescriptorHeap> cbvHeap_;
 
     std::unique_ptr<MeshGeometry> boxGeo_;
+    std::unique_ptr<VertexBuffer> vbuffer_;
+    std::unique_ptr<IndexBuffer> ibuffer_;
 
     Microsoft::WRL::ComPtr<ID3DBlob> vertexShaderByteCode_;
     Microsoft::WRL::ComPtr<ID3DBlob> pixelShaderByteCode_;
@@ -66,6 +68,6 @@ class BoxApp final : public D3DApp {
     DirectX::XMFLOAT4X4 matView_ = MathHelper::Identity4x4();
     DirectX::XMFLOAT4X4 matProjection_ = MathHelper::Identity4x4();
 
-    int lastMousePosX_;
-    int lastMousePosY_;
+    int lastMousePosX_ = 0;
+    int lastMousePosY_ = 0;
 };
