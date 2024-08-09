@@ -47,7 +47,7 @@ class BoxApp final : public D3DApp {
     std::unique_ptr<ConstantBuffer<ConstantBufferObject>> cbuffer_;
     std::unique_ptr<DescriptorHeap> cbvHeap_;
 
-    std::unique_ptr<MeshGeometry> boxGeo_;
+    std::unique_ptr<SubmeshGeometry> boxSubmesh_;
     std::unique_ptr<VertexBuffer> vbuffer_;
     std::unique_ptr<IndexBuffer> ibuffer_;
 

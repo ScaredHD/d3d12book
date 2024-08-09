@@ -90,10 +90,9 @@ void BoxApp::Draw() {
     SetViewportAndScissorRects();
 
     // Transition of back buffer to render target state
-    auto transition = CD3DX12_RESOURCE_BARRIER::Transition(swapChain_->GetCurrentBackBuffer(),
-                                                           D3D12_RESOURCE_STATE_PRESENT,
-                                                           D3D12_RESOURCE_STATE_RENDER_TARGET);
-    commandList_->ResourceBarrier(1, &transition);
+    Transition(swapChain_->GetCurrentBackBuffer(),
+               D3D12_RESOURCE_STATE_PRESENT,
+               D3D12_RESOURCE_STATE_RENDER_TARGET);
 
     auto rtv = swapChain_->GetCurrentBackBufferView();
     commandList_->ClearRenderTargetView(rtv, Colors::LightSteelBlue, 0, nullptr);
@@ -126,12 +125,15 @@ void BoxApp::Draw() {
         0,
         cbvHeap_->Get()->GetGPUDescriptorHandleForHeapStart());
 
-    commandList_->DrawIndexedInstanced(boxGeo_->DrawArgs["box"].IndexCount, 1, 0, 0, 0);
+    commandList_->DrawIndexedInstanced(boxSubmesh_->IndexCount,
+                                       1,
+                                       boxSubmesh_->StartIndexLocation,
+                                       boxSubmesh_->BaseVertexLocation,
+                                       0);
 
-    transition = CD3DX12_RESOURCE_BARRIER::Transition(swapChain_->GetCurrentBackBuffer(),
-                                                      D3D12_RESOURCE_STATE_RENDER_TARGET,
-                                                      D3D12_RESOURCE_STATE_PRESENT);
-    commandList_->ResourceBarrier(1, &transition);
+    Transition(swapChain_->GetCurrentBackBuffer(),
+               D3D12_RESOURCE_STATE_RENDER_TARGET,
+               D3D12_RESOURCE_STATE_PRESENT);
 
     ThrowIfFailed(commandList_->Close());
 
@@ -267,13 +269,11 @@ void BoxApp::BuildBoxGeometry() {
     };
     // clang-format on
 
-    boxGeo_ = std::make_unique<MeshGeometry>();
-    
     SubmeshGeometry submesh;
     submesh.IndexCount = (UINT)indices.size();
     submesh.StartIndexLocation = 0;
     submesh.BaseVertexLocation = 0;
-    boxGeo_->DrawArgs["box"] = submesh;
+    boxSubmesh_ = std::make_unique<SubmeshGeometry>(submesh);
 
     UINT vbByteSize = vertices.size() * sizeof(Vertex);
     vbuffer_ = std::make_unique<VertexBuffer>(sizeof(Vertex), vbByteSize);
