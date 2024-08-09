@@ -1,5 +1,6 @@
 #pragma once
 #include "Common/d3dUtil.h"
+#include "DescriptorHeap.h"
 
 template <typename T>
 class ConstantBuffer {
@@ -21,7 +22,13 @@ class ConstantBuffer {
 
     ID3D12Resource* Resource() const { return uploadBuffer_.Get(); }
 
-    void CopyData(int elementIndex, const T& data) {
+    D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const {
+        return uploadBuffer_->GetGPUVirtualAddress();
+    }
+
+    UINT GetElementByteSize() const { return elementByteSize_; }
+
+    void Load(int elementIndex, const T& data) {
         memcpy(&mappedData_[elementIndex * elementByteSize_], &data, sizeof(T));
     }
 
@@ -46,4 +53,20 @@ ConstantBuffer<T>::ConstantBuffer(ID3D12Device* device, UINT elementCount) {
                                                   IID_PPV_ARGS(&uploadBuffer_)));
 
     ThrowIfFailed(uploadBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedData_)));
+}
+
+template <typename T>
+void CreateConstantBufferViewOnHeap(ID3D12Device* device,
+                              ConstantBuffer<T>* cbuffer,
+                              UINT cbufferIndex,
+                              DescriptorHeap* heap,
+                              UINT heapIndex) {
+    auto addressGpu = cbuffer->GetGpuVirtualAddress();
+    addressGpu += cbufferIndex * cbuffer->GetElementByteSize();
+
+    D3D12_CONSTANT_BUFFER_VIEW_DESC desc{};
+    desc.BufferLocation = addressGpu;
+    desc.SizeInBytes = cbuffer->GetElementByteSize();
+
+    device->CreateConstantBufferView(&desc, heap->GetDescriptor(heapIndex));
 }

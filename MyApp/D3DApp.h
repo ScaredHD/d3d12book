@@ -20,7 +20,7 @@ class D3DApp : public MyApp {
     D3DApp(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
         : MyApp(hInstance, hPrevInstance, pCmdLine, nCmdShow) {}
 
-    void Initialize();
+    void Initialize(const wchar_t* windowName = L"D3D App");
 
     virtual bool InitializeD3D();
 
@@ -65,12 +65,12 @@ class D3DApp : public MyApp {
 
     void Transition(ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
 
-    Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
-    Microsoft::WRL::ComPtr<ID3D12Device> device;
+    Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory_;
+    Microsoft::WRL::ComPtr<ID3D12Device> device_;
 
-    Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
+    Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
 
     DXGI_FORMAT backBufferFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
     std::unique_ptr<SwapChain<2>> swapChain_;
@@ -79,27 +79,21 @@ class D3DApp : public MyApp {
     DXGI_FORMAT depthStencilFormat_ = DXGI_FORMAT_D24_UNORM_S8_UINT;
     std::unique_ptr<DescriptorHeap> dsvHeap_;
 
-    bool isPaused = false;
+    bool isPaused_ = false;
 
-    UINT64 nextFence = 0;
-    Microsoft::WRL::ComPtr<ID3D12Fence> fence;
+    UINT64 nextFence_ = 0;
+    Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
 
-    bool Msaa4xEnabled() const { return msaa4xEnabled; }
+    UINT msaa4XQuality_ = {};
+    bool msaa4XEnabled_ = false;
 
-    void SetMsaa4x(bool state);
-
-    UINT GetMsaa4xQuality() const { return msaa4xQuality; }
-
-    UINT msaa4xQuality = {};
-    bool msaa4xEnabled = false;
-
-    D3D12_VIEWPORT viewport = {};
-    RECT scissorRect = {};
+    D3D12_VIEWPORT viewport_ = {};
+    RECT scissorRect_ = {};
 
     // Game stats
     void CalculateFrameStats();
 
-    MyTimer timer;
-    int frameCount = 0;
-    float timeElapsed = 0.0f;
+    Timer timer_;
+    int frameCount_ = 0;
+    float timeElapsed_ = 0.0f;
 };

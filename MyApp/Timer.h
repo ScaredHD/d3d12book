@@ -2,13 +2,13 @@
 
 #include <windows.h>
 
-class MyTimer {
+class Timer {
   public:
     using TimeCount = __int64;
 
     static TimeCount GetCurrentCount();
 
-    MyTimer();
+    Timer();
 
     float TotalTimeFromStart() const;
 
