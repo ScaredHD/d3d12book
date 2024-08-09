@@ -35,7 +35,7 @@ D3D12_VERTEX_BUFFER_VIEW VertexBuffer::GetView() const {
     D3D12_VERTEX_BUFFER_VIEW vbv{};
     vbv.BufferLocation = vbuffer_.GetGpuVirtualAddress();
     vbv.StrideInBytes = byteStride_;
-    vbv.SizeInBytes = bufferByteSize_;
+    vbv.SizeInBytes = byteSize_;
     return vbv;
 }
 
@@ -50,6 +50,6 @@ D3D12_INDEX_BUFFER_VIEW IndexBuffer::GetView() const {
     D3D12_INDEX_BUFFER_VIEW ibv{};
     ibv.BufferLocation = ibuffer_.GetGpuVirtualAddress();
     ibv.Format = indexFormat_;
-    ibv.SizeInBytes = bufferByteSize_;
+    ibv.SizeInBytes = byteSize_;
     return ibv;
 }

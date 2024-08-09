@@ -28,9 +28,7 @@ class DefaultBuffer {
 
 class VertexBuffer {
   public:
-    VertexBuffer(UINT byteStride, UINT bufferByteSize)
-        : byteStride_(byteStride),
-          bufferByteSize_(bufferByteSize) {}
+    VertexBuffer(UINT byteStride, UINT byteSize) : byteStride_(byteStride), byteSize_(byteSize) {}
 
     void Load(ID3D12Device* device,
               ID3D12GraphicsCommandList* commandList,
@@ -44,14 +42,14 @@ class VertexBuffer {
     DefaultBuffer vbuffer_;
 
     UINT byteStride_ = 0;
-    UINT bufferByteSize_ = 0;
+    UINT byteSize_ = 0;
 };
 
 class IndexBuffer {
   public:
-    IndexBuffer(DXGI_FORMAT indexFormat, UINT bufferByteSize)
+    IndexBuffer(DXGI_FORMAT indexFormat, UINT byteSize)
         : indexFormat_(indexFormat),
-          bufferByteSize_(bufferByteSize) {}
+          byteSize_(byteSize) {}
 
     void Load(ID3D12Device* device,
               ID3D12GraphicsCommandList* commandList,
@@ -65,5 +63,5 @@ class IndexBuffer {
     DefaultBuffer ibuffer_;
 
     DXGI_FORMAT indexFormat_ = DXGI_FORMAT_R16_UINT;
-    UINT bufferByteSize_ = 0;
+    UINT byteSize_ = 0;
 };
