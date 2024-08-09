@@ -98,7 +98,7 @@ void BoxApp::Draw() {
     auto rtv = swapChain_->GetCurrentBackBufferView();
     commandList_->ClearRenderTargetView(rtv, Colors::LightSteelBlue, 0, nullptr);
 
-    auto dsv = dsvHeap_->GetDescriptor(0);
+    auto dsv = dsvHeap_->GetDescriptorHandleCpu(0);
     commandList_->ClearDepthStencilView(dsv,
                                         D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
                                         1.0f,

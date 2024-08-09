@@ -33,7 +33,7 @@ class SwapChain {
             ThrowIfFailed(
                 dxgiSwapChain_->GetBuffer(i, IID_PPV_ARGS(buffers_[i].ReleaseAndGetAddressOf())));
 
-            device->CreateRenderTargetView(buffers_[i].Get(), nullptr, rtvHeap_->GetDescriptor(i));
+            device->CreateRenderTargetView(buffers_[i].Get(), nullptr, rtvHeap_->GetDescriptorHandleCpu(i));
         }
     }
 
@@ -54,7 +54,7 @@ class SwapChain {
     ID3D12Resource* GetCurrentBackBuffer() const { return buffers_[currentBackBuffer_].Get(); }
 
     D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentBackBufferView() const {
-        return rtvHeap_->GetDescriptor(currentBackBuffer_);
+        return rtvHeap_->GetDescriptorHandleCpu(currentBackBuffer_);
     }
 
     HRESULT Resize(int clientWidth, int clientHeight) {

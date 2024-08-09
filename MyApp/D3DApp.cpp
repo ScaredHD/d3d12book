@@ -174,7 +174,7 @@ void D3DApp::Draw() {
                                         DirectX::Colors::LightSteelBlue,
                                         0,
                                         nullptr);
-    commandList_->ClearDepthStencilView(dsvHeap_->GetDescriptor(0),
+    commandList_->ClearDepthStencilView(dsvHeap_->GetDescriptorHandleCpu(0),
                                         D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
                                         1.0f,
                                         0,
@@ -182,7 +182,7 @@ void D3DApp::Draw() {
                                         nullptr);
 
     auto rtv = swapChain_->GetCurrentBackBufferView();
-    auto dsv = dsvHeap_->GetDescriptor(0);
+    auto dsv = dsvHeap_->GetDescriptorHandleCpu(0);
     commandList_->OMSetRenderTargets(1, &rtv, true, &dsv);
 
     Transition(swapChain_->GetCurrentBackBuffer(),
@@ -306,7 +306,7 @@ void D3DApp::CreateDepthStencilView() {
     desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     desc.Texture2D.MipSlice = 0;
 
-    device_->CreateDepthStencilView(depthStencilBuffer_.Get(), &desc, dsvHeap_->GetDescriptor(0));
+    device_->CreateDepthStencilView(depthStencilBuffer_.Get(), &desc, dsvHeap_->GetDescriptorHandleCpu(0));
 
     Transition(depthStencilBuffer_.Get(),
                D3D12_RESOURCE_STATE_COMMON,

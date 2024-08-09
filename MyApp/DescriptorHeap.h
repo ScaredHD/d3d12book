@@ -16,8 +16,12 @@ class DescriptorHeap {
         return descriptorSize_;
     }
 
-    CD3DX12_CPU_DESCRIPTOR_HANDLE GetDescriptor(int index) {
+    CD3DX12_CPU_DESCRIPTOR_HANDLE GetDescriptorHandleCpu(int index) {
         return {heap_->GetCPUDescriptorHandleForHeapStart(), index, descriptorSize_};
+    }
+
+    CD3DX12_GPU_DESCRIPTOR_HANDLE GetDescriptorHandleGpu(int index) {
+        return {heap_->GetGPUDescriptorHandleForHeapStart(), index, descriptorSize_};
     }
 
   private:

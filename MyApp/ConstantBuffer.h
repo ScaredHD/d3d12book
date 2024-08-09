@@ -68,5 +68,5 @@ void CreateConstantBufferViewOnHeap(ID3D12Device* device,
     desc.BufferLocation = addressGpu;
     desc.SizeInBytes = cbuffer->GetElementByteSize();
 
-    device->CreateConstantBufferView(&desc, heap->GetDescriptor(heapIndex));
+    device->CreateConstantBufferView(&desc, heap->GetDescriptorHandleCpu(heapIndex));
 }
