@@ -28,21 +28,11 @@ class D3DApp : public MyApp {
 
     virtual void Draw() = 0;
 
-    LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
-
   protected:
     virtual void OnInitialize() = 0;
     virtual void OnUpdate() = 0;
 
     void DefaultDraw();
-
-    void OnMouseDown(int xPos, int yPos) override;
-
-    void OnMouseUp(int xPos, int yPos) override;
-
-    void OnKeyDown() override;
-
-    void OnKeyUp() override;
 
     void OnResize() override;
 
@@ -82,7 +72,7 @@ class D3DApp : public MyApp {
 
     bool isPaused_ = false;
 
-    UINT64 nextFence_ = 0;
+    UINT64 nextFenceValue_ = 0;
     Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
 
     UINT msaa4XQuality_ = {};

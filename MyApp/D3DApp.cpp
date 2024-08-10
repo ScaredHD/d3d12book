@@ -2,34 +2,6 @@
 
 using namespace Microsoft::WRL;
 
-LRESULT D3DApp::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (msg == WM_SIZE) {
-        D3DApp::OnResize();
-        return 0;
-    }
-    return MyApp::HandleMessage(hwnd, msg, wParam, lParam);
-}
-
-void D3DApp::OnMouseUp(int xPos, int yPos) {
-    MyApp::OnMouseUp(xPos, yPos);
-}
-
-void D3DApp::OnMouseDown(int xPos, int yPos) {
-    MyApp::OnMouseDown(xPos, yPos);
-}
-
-void D3DApp::OnKeyDown() {
-    if (IsKeyDown('S')) {
-        MessageBox(GetWindow(), L"test", L"test caption", 0);
-        OutputDebugString(L"S key is pressed\n");
-        return;
-    }
-    MyApp::OnKeyDown();
-}
-
-void D3DApp::OnKeyUp() {
-    MyApp::OnKeyUp();
-}
 
 void D3DApp::UpdateViewport() {
     auto w = static_cast<LONG>(GetClientWidth());
@@ -256,11 +228,11 @@ void D3DApp::CreateDsvHeaps() {
 }
 
 void D3DApp::FlushCommandQueue() {
-    ThrowIfFailed(commandQueue_->Signal(fence_.Get(), ++nextFence_));
+    ThrowIfFailed(commandQueue_->Signal(fence_.Get(), ++nextFenceValue_));
 
-    if (fence_->GetCompletedValue() < nextFence_) {
+    if (fence_->GetCompletedValue() < nextFenceValue_) {
         auto eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
-        ThrowIfFailed(fence_->SetEventOnCompletion(nextFence_, eventHandle));
+        ThrowIfFailed(fence_->SetEventOnCompletion(nextFenceValue_, eventHandle));
         WaitForSingleObject(eventHandle, INFINITE);
         CloseHandle(eventHandle);
     }
@@ -306,7 +278,9 @@ void D3DApp::CreateDepthStencilView() {
     desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     desc.Texture2D.MipSlice = 0;
 
-    device_->CreateDepthStencilView(depthStencilBuffer_.Get(), &desc, dsvHeap_->GetDescriptorHandleCpu(0));
+    device_->CreateDepthStencilView(depthStencilBuffer_.Get(),
+                                    &desc,
+                                    dsvHeap_->GetDescriptorHandleCpu(0));
 
     Transition(depthStencilBuffer_.Get(),
                D3D12_RESOURCE_STATE_COMMON,

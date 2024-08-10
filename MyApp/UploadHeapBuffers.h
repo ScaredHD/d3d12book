@@ -8,7 +8,8 @@ class UploadBuffer {
   public:
     UploadBuffer(ID3D12Device* device, UINT elementCount) {
         elementByteSize_ = sizeof(T);
-        
+        elementCount_ = elementCount;
+
         auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
         auto desc = CD3DX12_RESOURCE_DESC::Buffer(elementCount * elementByteSize_);
         ThrowIfFailed(device->CreateCommittedResource(&heapProp,
@@ -36,11 +37,15 @@ class UploadBuffer {
 
     ID3D12Resource* Resource() const { return uploadBuffer_.Get(); }
 
-    D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const {
-        return uploadBuffer_->GetGPUVirtualAddress();
+    D3D12_GPU_VIRTUAL_ADDRESS GetElementGpuVirtualAddress(int elementIndex) const {
+        return uploadBuffer_->GetGPUVirtualAddress() + elementIndex * elementByteSize_;
     }
 
     UINT GetElementByteSize() const { return elementByteSize_; }
+
+    UINT GetElementCount() const { return elementCount_; }
+
+    UINT GetBufferByteSize() const { return elementCount_ * elementByteSize_; }
 
     void Load(int elementIndex, const T& data) {
         memcpy(&mappedData_[elementIndex * elementByteSize_], &data, sizeof(T));
@@ -51,6 +56,7 @@ class UploadBuffer {
     BYTE* mappedData_ = nullptr;
 
     UINT elementByteSize_ = 0;
+    UINT elementCount_ = 0;
 };
 
 template <typename T>
@@ -58,6 +64,7 @@ class ConstantBuffer {
   public:
     ConstantBuffer(ID3D12Device* device, UINT elementCount) {
         elementByteSize_ = d3dUtil::CalcConstantBufferByteSize(sizeof(T));
+        elementCount_ = elementCount;
 
         auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
         auto desc = CD3DX12_RESOURCE_DESC::Buffer(elementByteSize_ * elementCount);
@@ -86,11 +93,15 @@ class ConstantBuffer {
 
     ID3D12Resource* Resource() const { return uploadBuffer_.Get(); }
 
-    D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const {
-        return uploadBuffer_->GetGPUVirtualAddress();
+    D3D12_GPU_VIRTUAL_ADDRESS GetElementGpuVirtualAddress(int elementIndex) const {
+        return uploadBuffer_->GetGPUVirtualAddress() + elementIndex * elementByteSize_;
     }
 
     UINT GetElementByteSize() const { return elementByteSize_; }
+
+    UINT GetElementCount() const { return elementCount_; }
+
+    UINT GetBufferByteSize() const { return elementCount_ * elementByteSize_; }
 
     void Load(int elementIndex, const T& data) {
         memcpy(&mappedData_[elementIndex * elementByteSize_], &data, sizeof(T));
@@ -101,6 +112,7 @@ class ConstantBuffer {
     BYTE* mappedData_ = nullptr;
 
     UINT elementByteSize_ = 0;
+    UINT elementCount_ = 0;
 };
 
 template <typename T>

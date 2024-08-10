@@ -87,23 +87,40 @@ LRESULT MyApp::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             return 0;
 
         case WM_SIZE:
-            MyApp::OnResize();
+            OnResize();
             return 0;
 
         case WM_LBUTTONDOWN:
-            mouseDown = true;
+            OnLMouseDown();
+            lMouseDown_ = true;
             return 0;
 
         case WM_LBUTTONUP:
-            mouseDown = false;
+            OnLMouseUp();
+            lMouseDown_ = false;
+            return 0;
+
+        case WM_RBUTTONDOWN:
+            OnRMouseDown();
+            rMouseDown_ = true;
+            return 0;
+
+        case WM_RBUTTONUP:
+            OnRMouseUp();
+            rMouseDown_ = false;
             return 0;
 
         case WM_MOUSEMOVE:
-            mousePos = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+            mousePos_ = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+            OnMouseMove();
             return 0;
 
         case WM_KEYDOWN:
-            MyApp::OnKeyDown();
+            OnKeyDown();
+            return 0;
+        
+        case WM_KEYUP:
+            OnKeyUp();
             return 0;
     }
 

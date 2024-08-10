@@ -26,14 +26,20 @@ class MyApp {
 
     unsigned int GetClientHeight() const { return clientHeight; }
 
-    float GetAspectRatio() const { return static_cast<float>(clientWidth) / clientHeight; }
+    float GetAspectRatio() const {
+        return static_cast<float>(clientWidth) / static_cast<float>(clientHeight);
+    }
 
   protected:
-    virtual void OnMouseDown(int xPos, int yPos) {}
+    virtual void OnLMouseDown() {}
 
-    virtual void OnMouseUp(int xPos, int yPos) {}
+    virtual void OnLMouseUp() {}
 
-    virtual void OnMouseMove(int xPos, int yPos) {}
+    virtual void OnRMouseDown() {}
+
+    virtual void OnRMouseUp() {}
+
+    virtual void OnMouseMove() {}
 
     virtual void OnKeyDown() {}
 
@@ -41,17 +47,17 @@ class MyApp {
 
     virtual void OnResize() {}
 
-    [[nodiscard]] bool IsMouseDown() const { return mouseDown; }
-
-    [[nodiscard]] bool IsKeyDown(char key) const { return GetKeyState(key) & 0x8000; }
+    [[nodiscard]] static bool IsKeyDown(char key) { return GetKeyState(key) & 0x8000; }
 
     auto GetWindow() const { return hwnd; }
 
     auto GetWindowName() const { return windowName; }
 
-    int GetMouseX() const { return mousePos.x; }
+    POINT GetMousePos() const { return mousePos_; }
 
-    int GetMouseY() const { return mousePos.y; }
+    bool IsLMouseDown() const { return lMouseDown_; }
+
+    bool IsRMouseDown() const { return rMouseDown_; }
 
   private:
     // ReSharper disable once IdentifierTypo
@@ -68,6 +74,7 @@ class MyApp {
 
     bool isRunning;
 
-    bool mouseDown;
-    POINT mousePos;
+    bool lMouseDown_;
+    bool rMouseDown_;
+    POINT mousePos_;
 };
