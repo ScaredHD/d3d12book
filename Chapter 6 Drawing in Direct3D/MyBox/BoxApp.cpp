@@ -6,8 +6,6 @@ using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
 void BoxApp::OnInitialize() {
-    D3DApp::OnInitialize();
-
     ThrowIfFailed(commandList_->Reset(commandAllocator_.Get(), nullptr));
 
     BuildCbvHeap();
@@ -31,8 +29,6 @@ void BoxApp::OnResize() {
 }
 
 void BoxApp::OnUpdate() {
-    D3DApp::OnUpdate();
-
     if (IsMouseDown()) {
         // Make each pixel correspond to a quarter of a degree.
         float dx = XMConvertToRadians(0.25f * static_cast<float>(GetMouseX() - lastMousePosX_));

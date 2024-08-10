@@ -26,14 +26,15 @@ class D3DApp : public MyApp {
 
     void Update();
 
-    virtual void Draw();
+    virtual void Draw() = 0;
 
     LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
   protected:
-    virtual void OnInitialize() {}
+    virtual void OnInitialize() = 0;
+    virtual void OnUpdate() = 0;
 
-    virtual void OnUpdate() {}
+    void DefaultDraw();
 
     void OnMouseDown(int xPos, int yPos) override;
 

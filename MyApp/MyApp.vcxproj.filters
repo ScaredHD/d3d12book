@@ -27,7 +27,7 @@
     <ClCompile Include="DescriptorHeap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DefaultBuffer.cpp">
+    <ClCompile Include="DefaultHeapBuffers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\d3dUtil.cpp">
@@ -56,7 +56,7 @@
     <ClInclude Include="DescriptorHeap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DefaultBuffer.h">
+    <ClInclude Include="DefaultHeapBuffers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\d3dUtil.h">
@@ -71,10 +71,7 @@
     <ClInclude Include="..\Common\MathHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\UploadBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
+    <ClInclude Include="UploadHeapBuffers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

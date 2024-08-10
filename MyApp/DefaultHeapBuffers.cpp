@@ -1,4 +1,4 @@
-#include "DefaultBuffer.h"
+#include "DefaultHeapBuffers.h"
 
 DefaultBuffer::DefaultBuffer(ID3D12Device* device,
                              ID3D12GraphicsCommandList* commandList,
@@ -34,7 +34,7 @@ void VertexBuffer::Load(ID3D12Device* device,
 D3D12_VERTEX_BUFFER_VIEW VertexBuffer::GetView() const {
     D3D12_VERTEX_BUFFER_VIEW vbv{};
     vbv.BufferLocation = vbuffer_.GetGpuVirtualAddress();
-    vbv.StrideInBytes = byteStride_;
+    vbv.StrideInBytes = strideInByte_;
     vbv.SizeInBytes = byteSize_;
     return vbv;
 }

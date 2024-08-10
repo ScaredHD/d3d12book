@@ -2,9 +2,9 @@
 #include <WindowsX.h>
 
 #include "Common/d3dUtil.h"
-#include "ConstantBuffer.h"
-#include "DefaultBuffer.h"
+#include "MyApp/DefaultHeapBuffers.h"
 #include "MyApp/D3DApp.h"
+#include "UploadHeapBuffers.h"
 
 struct Vertex {
     DirectX::XMFLOAT3 pos;

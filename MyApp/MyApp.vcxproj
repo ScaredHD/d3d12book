@@ -149,7 +149,7 @@
     <ClCompile Include="..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="..\Common\MathHelper.cpp" />
     <ClCompile Include="App.cpp" />
-    <ClCompile Include="DefaultBuffer.cpp" />
+    <ClCompile Include="DefaultHeapBuffers.cpp" />
     <ClCompile Include="D3DApp.cpp" />
     <ClCompile Include="DescriptorHeap.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -159,14 +159,13 @@
     <ClInclude Include="..\Common\d3dx12.h" />
     <ClInclude Include="..\Common\GeometryGenerator.h" />
     <ClInclude Include="..\Common\MathHelper.h" />
-    <ClInclude Include="..\Common\UploadBuffer.h" />
     <ClInclude Include="App.h" />
-    <ClInclude Include="ConstantBuffer.h" />
-    <ClInclude Include="DefaultBuffer.h" />
+    <ClInclude Include="DefaultHeapBuffers.h" />
     <ClInclude Include="D3DApp.h" />
     <ClInclude Include="DescriptorHeap.h" />
     <ClInclude Include="SwapChain.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="UploadHeapBuffers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

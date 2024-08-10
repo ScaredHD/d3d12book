@@ -160,7 +160,7 @@ void D3DApp::SetViewportAndScissorRects() {
     commandList_->RSSetScissorRects(1, &scissorRect_);
 }
 
-void D3DApp::Draw() {
+void D3DApp::DefaultDraw() {
     ThrowIfFailed(commandAllocator_->Reset());
     ThrowIfFailed(commandList_->Reset(commandAllocator_.Get(), nullptr));
 

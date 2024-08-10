@@ -28,7 +28,7 @@ class DefaultBuffer {
 
 class VertexBuffer {
   public:
-    VertexBuffer(UINT byteStride, UINT byteSize) : byteStride_(byteStride), byteSize_(byteSize) {}
+    VertexBuffer(UINT strideInByte, UINT byteSize) : strideInByte_(strideInByte), byteSize_(byteSize) {}
 
     void Load(ID3D12Device* device,
               ID3D12GraphicsCommandList* commandList,
@@ -41,7 +41,7 @@ class VertexBuffer {
   private:
     DefaultBuffer vbuffer_;
 
-    UINT byteStride_ = 0;
+    UINT strideInByte_ = 0;
     UINT byteSize_ = 0;
 };
 
