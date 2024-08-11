@@ -60,6 +60,15 @@ class UploadBuffer {
 };
 
 template <typename T>
+D3D12_VERTEX_BUFFER_VIEW ViewAsVertexBuffer(const UploadBuffer<T>* uploadBuffer) {
+    D3D12_VERTEX_BUFFER_VIEW vbv;
+    vbv.BufferLocation = uploadBuffer->GetElementGpuVirtualAddress(0);
+    vbv.StrideInBytes = uploadBuffer->GetElementByteSize();
+    vbv.SizeInBytes = uploadBuffer->GetBufferByteSize();
+    return vbv;
+}
+
+template <typename T>
 class ConstantBuffer {
   public:
     ConstantBuffer(ID3D12Device* device, UINT elementCount) {

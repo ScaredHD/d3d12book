@@ -323,10 +323,7 @@ void LandAndWaves::DrawAllRenderItems() {
 
     // Draw waves
     auto* waveVbuffer = currentFrameResource_->waveVbuffer.get();
-    D3D12_VERTEX_BUFFER_VIEW vbv;
-    vbv.BufferLocation = waveVbuffer->GetElementGpuVirtualAddress(0);
-    vbv.StrideInBytes = waveVbuffer->GetElementByteSize();
-    vbv.SizeInBytes = waveVbuffer->GetBufferByteSize();
+    D3D12_VERTEX_BUFFER_VIEW vbv = ViewAsVertexBuffer(waveVbuffer);
     commandList_->IASetVertexBuffers(0, 1, &vbv);
 
     auto ibv = wavesIbuffer_->GetView();
