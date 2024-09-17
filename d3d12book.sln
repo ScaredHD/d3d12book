@@ -5,7 +5,7 @@ VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyApp", "MyApp\MyApp.vcxproj", "{D1818D47-2103-4B91-940C-2D2786F29E7D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyLandAndWaves", "Chapter 7 Drawing in Direct3D Part II\MyLandAndWaves\MyLandAndWaves.vcxproj", "{7219D438-B3BB-47F5-BF44-D4F678D49E94}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyTex", "Chapter 9 Texturing\MyTex\MyTex.vcxproj", "{1C168D9B-B5AC-4A9F-B4ED-5E1826A91DAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,14 +23,14 @@ Global
 		{D1818D47-2103-4B91-940C-2D2786F29E7D}.Release|x64.Build.0 = Release|x64
 		{D1818D47-2103-4B91-940C-2D2786F29E7D}.Release|x86.ActiveCfg = Release|Win32
 		{D1818D47-2103-4B91-940C-2D2786F29E7D}.Release|x86.Build.0 = Release|Win32
-		{7219D438-B3BB-47F5-BF44-D4F678D49E94}.Debug|x64.ActiveCfg = Debug|x64
-		{7219D438-B3BB-47F5-BF44-D4F678D49E94}.Debug|x64.Build.0 = Debug|x64
-		{7219D438-B3BB-47F5-BF44-D4F678D49E94}.Debug|x86.ActiveCfg = Debug|Win32
-		{7219D438-B3BB-47F5-BF44-D4F678D49E94}.Debug|x86.Build.0 = Debug|Win32
-		{7219D438-B3BB-47F5-BF44-D4F678D49E94}.Release|x64.ActiveCfg = Release|x64
-		{7219D438-B3BB-47F5-BF44-D4F678D49E94}.Release|x64.Build.0 = Release|x64
-		{7219D438-B3BB-47F5-BF44-D4F678D49E94}.Release|x86.ActiveCfg = Release|Win32
-		{7219D438-B3BB-47F5-BF44-D4F678D49E94}.Release|x86.Build.0 = Release|Win32
+		{1C168D9B-B5AC-4A9F-B4ED-5E1826A91DAB}.Debug|x64.ActiveCfg = Debug|x64
+		{1C168D9B-B5AC-4A9F-B4ED-5E1826A91DAB}.Debug|x64.Build.0 = Debug|x64
+		{1C168D9B-B5AC-4A9F-B4ED-5E1826A91DAB}.Debug|x86.ActiveCfg = Debug|Win32
+		{1C168D9B-B5AC-4A9F-B4ED-5E1826A91DAB}.Debug|x86.Build.0 = Debug|Win32
+		{1C168D9B-B5AC-4A9F-B4ED-5E1826A91DAB}.Release|x64.ActiveCfg = Release|x64
+		{1C168D9B-B5AC-4A9F-B4ED-5E1826A91DAB}.Release|x64.Build.0 = Release|x64
+		{1C168D9B-B5AC-4A9F-B4ED-5E1826A91DAB}.Release|x86.ActiveCfg = Release|Win32
+		{1C168D9B-B5AC-4A9F-B4ED-5E1826A91DAB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
