@@ -240,9 +240,7 @@ void LandAndWaves::Draw() {
 void LandAndWaves::BuildLandGeometry() {
     auto gridMesh = GeometryGenerator{}.CreateGrid(160.0f, 160.0f, 50, 50);
 
-    auto height = [](float x, float z) {
-        return 0.3f * (z * sinf(0.1f * x) + x * cosf(0.1f * z));
-    };
+    auto height = [](float x, float z) { return 0.3f * (z * sinf(0.1f * x) + x * cosf(0.1f * z)); };
 
     auto color = [](float h) {
         if (h < -10.f) {
